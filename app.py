@@ -538,27 +538,59 @@ def page_cookie_guide() -> None:
                 """
             )
 
-    st.markdown("### 📤 Upload cookies.txt Directly")
-    up_file = st.file_uploader("Upload exported cookies.txt file", type=["txt"])
-    if up_file is not None:
-        target_path = cfg.APP_DIR / "cookies.txt"
-        target_path.write_bytes(up_file.getvalue())
-        S["cookies_file"] = str(target_path)
-        S["cookies_browser"] = "None"
-        cfg.save(S)
-        st.success(f"✅ Saved cookies to `{target_path}`! Cookie authentication is now active.")
-        st.rerun()
+    with st.container(border=True):
+        st.markdown("### 📤 Add cookies.txt (Upload or Paste)")
+        tab_up, tab_paste = st.tabs(["📁 Upload File", "📝 Paste Text"])
 
-    if has_file:
-        if st.button("🗑️ Delete Saved cookies.txt", type="secondary"):
-            try:
-                os.remove(ck_file)
-            except Exception:
-                pass
-            S["cookies_file"] = ""
-            cfg.save(S)
-            st.toast("Deleted saved cookie file.")
-            st.rerun()
+        with tab_up:
+            up_file = st.file_uploader("Choose your exported cookies.txt file", type=["txt"], key="cookie_file_uploader")
+            if up_file is not None:
+                st.info(f"📄 Selected file: **{up_file.name}** ({up_file.size} bytes)")
+                if st.button("💾 Save & Activate Uploaded Cookies", type="primary", use_container_width=True, key="btn_save_up_cookie"):
+                    target_path = cfg.APP_DIR / "cookies.txt"
+                    target_path.write_bytes(up_file.getvalue())
+                    S["cookies_file"] = str(target_path)
+                    S["cookies_browser"] = "None"
+                    cfg.save(S)
+                    st.toast("✅ Cookies successfully saved and activated!")
+                    st.rerun()
+
+        with tab_paste:
+            cookie_text = st.text_area(
+                "Paste raw Netscape cookie text here",
+                placeholder="# Netscape HTTP Cookie File\n.youtube.com\tTRUE\t/\tTRUE...",
+                height=130,
+                key="raw_cookie_paste",
+            )
+            if st.button("💾 Save & Activate Pasted Cookies", type="primary", use_container_width=True, key="btn_save_paste_cookie"):
+                if cookie_text.strip():
+                    target_path = cfg.APP_DIR / "cookies.txt"
+                    target_path.write_text(cookie_text.strip(), encoding="utf-8")
+                    S["cookies_file"] = str(target_path)
+                    S["cookies_browser"] = "None"
+                    cfg.save(S)
+                    st.toast("✅ Pasted cookies saved and activated!")
+                    st.rerun()
+                else:
+                    st.warning("Please paste valid cookie text before saving.")
+
+        if has_file:
+            st.markdown("---")
+            cc1, cc2 = st.columns([3, 1])
+            with cc1:
+                f_size = os.path.getsize(ck_file) if os.path.exists(ck_file) else 0
+                st.caption(f"💾 Active file: `{ck_file}` ({f_size} bytes)")
+            with cc2:
+                if st.button("🗑️ Delete Saved cookies.txt", type="secondary", use_container_width=True, key="btn_del_cookie"):
+                    try:
+                        if os.path.exists(ck_file):
+                            os.remove(ck_file)
+                    except Exception:
+                        pass
+                    S["cookies_file"] = ""
+                    cfg.save(S)
+                    st.toast("Deleted saved cookie file.")
+                    st.rerun()
 
     is_cloud = os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true" or "/home/appuser" in str(cfg.APP_DIR)
     if is_cloud:

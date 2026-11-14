@@ -64,22 +64,8 @@ st.markdown(theme.get_css(theme=current_theme, accent_color=accent_hex), unsafe_
 def page_dashboard() -> None:
     comp.render_brand_header(LOGO)
 
-    # Cookie alert if no cookie source configured
     ck_browser = S.get("cookies_browser", "None")
     ck_file = S.get("cookies_file", "").strip()
-    has_file = ck_file and Path(ck_file).is_file() and Path(ck_file).stat().st_size > 0
-    if ck_browser == "None" and not has_file:
-        c_warn, c_btn = st.columns([3, 1.2])
-        with c_warn:
-            st.warning(
-                "⚠️ **No cookie source configured.** YouTube often requires verification for high resolutions or age-restricted media."
-            )
-        with c_btn:
-            if st.button("🦊 Use Firefox (1-Click)", use_container_width=True, type="primary"):
-                S["cookies_browser"] = "Firefox"
-                cfg.save(S)
-                st.toast("Firefox cookies activated!")
-                st.rerun()
 
     # Top Hero Card
     with st.container(border=True):

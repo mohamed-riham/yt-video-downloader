@@ -207,6 +207,9 @@ def extract_urls(text: str) -> list[str]:
 
 def check_clipboard_for_url() -> str | None:
     """Check if clipboard contains a valid YouTube URL. Returns the URL or None."""
+    # Only check clipboard on desktop Windows
+    if os.name != "nt" or not os.environ.get("USERPROFILE"):
+        return None
     try:
         clip = clipboard()
         if clip and classify(clip) in ("video", "playlist", "both"):
@@ -218,12 +221,14 @@ def check_clipboard_for_url() -> str | None:
 
 def _tk(code: str) -> str:
     """Run a small isolated Tkinter script in a subprocess to avoid blocking the main thread."""
+    if os.name != "nt" or not os.environ.get("USERPROFILE"):
+        return ""
     try:
         res = subprocess.run(
             [sys.executable, "-c", code],
             capture_output=True,
             text=True,
-            timeout=60,
+            timeout=5,
         )
         return res.stdout.strip()
     except Exception:

@@ -70,8 +70,7 @@ def build_opts(j: Job, hook, pp_hook) -> dict:
         "noplaylist": True,
         "nooverwrites": True,
         "continuedl": True,
-        "concurrent_fragment_downloads": 8,
-        "http_chunk_size": 10485760,
+        "concurrent_fragment_downloads": 4,
         "buffersize": 1024 * 64,
         "retries": int(ss.get("max_retries", 5)),
         "fragment_retries": int(ss.get("max_retries", 5)),
@@ -115,15 +114,16 @@ def build_opts(j: Job, hook, pp_hook) -> dict:
             ]
 
     # Thumbnail download
-    if j.save_thumbnail:
+    if j.save_thumbnail or (j.embed_thumbnail and ss.get("embed_thumbnail", True)):
         o["writethumbnail"] = True
 
     # Video or Audio format selection
     if j.kind == "Video":
         h = j.quality.rstrip("p")
-        o["format"] = "bv*+ba/b" if not h.isdigit() else (
-            f"bv*[height<={h}][ext=mp4]+ba[ext=m4a]/bv*[height<={h}]+ba/b[height<={h}]/b"
-        )
+        if not h.isdigit():
+            o["format"] = "bv*+ba/b"
+        else:
+            o["format"] = f"bv*[height<={h}]+ba/b[height<={h}]/b"
         o["merge_output_format"] = "mp4"
         o["prefer_free_formats"] = False
 
@@ -250,29 +250,36 @@ class Manager:
                 tot = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
                 j.done = d.get("downloaded_bytes") or 0
                 j.total = tot
-                j.pct = j.done / tot * 100 if tot else 0
-                j.speed = d.get("speed") or 0
-                j.eta = d.get("eta") or 0
+                j.pct = (j.done / tot * 100.0) if tot else 0.0
+                j.speed = d.get("speed") or 0.0
+                j.eta = int(d.get("eta") or 0)
                 vc = (d.get("info_dict") or {}).get("vcodec")
-                j.stage = "Downloading video" if vc not in (None, "none") else "Downloading audio"
+                if vc not in (None, "none"):
+                    j.stage = "Downloading video stream"
+                else:
+                    j.stage = "Downloading audio stream"
             elif d["status"] == "finished":
-                j.stage = "Finalizing"
+                j.stage = "Stream download complete"
 
         def pp(d: dict) -> None:
             if d["status"] == "started":
                 j.status = "Processing"
                 pname = d.get("postprocessor", "")
                 if "Merger" in pname:
-                    j.stage = "Merging streams with FFmpeg"
+                    j.stage = "Merging video & audio with FFmpeg"
                 elif "ExtractAudio" in pname:
-                    j.stage = "Converting audio with FFmpeg"
+                    j.stage = "Extracting & converting audio"
                 elif "Metadata" in pname:
-                    j.stage = "Embedding tags & cover art"
+                    j.stage = "Embedding tags & chapters"
+                elif "EmbedThumbnail" in pname:
+                    j.stage = "Embedding cover art"
                 else:
-                    j.stage = "Post-processing"
+                    j.stage = f"Processing ({pname})"
+            elif d["status"] == "finished":
+                j.stage = "Post-processing complete"
 
         j.status = "Downloading"
-        j.stage = "Starting"
+        j.stage = "Connecting to YouTube"
         try:
             os.makedirs(j.outdir, exist_ok=True)
             if shutil.disk_usage(j.outdir).free < 200 * 2**20:
@@ -302,8 +309,9 @@ class Manager:
                         break
 
             j.file = filepath
-            j.status = j.stage = "Done"
-            j.pct = 100
+            j.status = "Done"
+            j.stage = "Completed"
+            j.pct = 100.0
             size = os.path.getsize(j.file) if j.file and os.path.exists(j.file) else 0
             res = f"{rd.get('height')}p" if j.kind == "Video" and rd.get("height") else j.quality
 

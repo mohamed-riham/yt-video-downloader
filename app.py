@@ -321,24 +321,26 @@ def _render_queue() -> None:
                     st.markdown(f"<div style='margin-bottom: 6px;'>{status_badge} &bull; <span style='color:var(--text-secondary); font-weight:600;'>{j.kind} ({j.quality}){size_label}</span></div>", unsafe_allow_html=True)
                     if j.file:
                         st.caption(f"💾 Saved to: `{j.file}`")
+                    st.progress(1.0, text=f"100% • Completed & Ready ({fmt_size(file_size)})")
                 elif j.status == "Failed":
                     status_badge = '<span class="kuro-chip" style="background: rgba(239, 68, 68, 0.16); color: var(--error); border-color: var(--error);">✖ Failed</span>'
                     st.markdown(f"<div style='margin-bottom: 6px;'>{status_badge} &bull; <span style='color:var(--text-secondary);'>{j.kind} ({j.quality})</span></div>", unsafe_allow_html=True)
-                elif j.status in ("Queued", "Processing"):
+                elif j.status == "Queued":
                     status_badge = f'<span class="kuro-chip kuro-chip-warning">⏳ {j.stage}</span>'
                     st.markdown(f"<div style='margin-bottom: 6px;'>{status_badge} &bull; <span style='color:var(--text-secondary);'>{j.kind} ({j.quality})</span></div>", unsafe_allow_html=True)
+                    st.progress(0.0, text="⏳ In Queue — Waiting for download slot...")
                 else:
-                    # Downloading
-                    status_badge = f'<span class="kuro-chip kuro-chip-success">🟢 {j.stage}</span>'
+                    # Downloading or Processing
+                    badge_class = "kuro-chip-success" if j.status == "Downloading" else "kuro-chip-warning"
+                    status_badge = f'<span class="kuro-chip {badge_class}">🟢 {j.stage}</span>'
                     details = f"{status_badge} &bull; <span style='font-weight:600; color:var(--text-secondary);'>{j.kind} ({j.quality})</span>"
                     if speed_str or eta_str:
                         details += f" &bull; <span style='color:var(--accent); font-weight:700;'>{speed_str} {eta_str}</span>"
                     st.markdown(f"<div style='margin-bottom: 8px;'>{details}</div>", unsafe_allow_html=True)
 
-                if j.status in ("Downloading", "Processing"):
                     pct_val = max(0.0, min(1.0, (j.pct or 0.0) / 100.0))
                     prog_text = f"{j.pct:.1f}% • {j.stage}"
-                    if j.done and j.total:
+                    if j.done and j.total and ("(" not in j.stage):
                         prog_text += f" ({fmt_size(j.done)} / {fmt_size(j.total)})"
                     if speed_str:
                         prog_text += f" • {speed_str}"

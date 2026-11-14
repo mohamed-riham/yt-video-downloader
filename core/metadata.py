@@ -19,8 +19,11 @@ def _fetch_cached(url: str, playlist: bool, browser: str, cfile: str) -> dict:
     }
     if not playlist:
         opts["playlistend"] = 1
+    from config.settings import COOKIES_FILE
     if cfile and Path(cfile).is_file():
         opts["cookiefile"] = cfile
+    elif Path(COOKIES_FILE).is_file() and Path(COOKIES_FILE).stat().st_size > 0:
+        opts["cookiefile"] = str(COOKIES_FILE)
     elif browser and str(browser).lower() != "none":
         b_name = str(browser).lower().split()[0]
         opts["cookiesfrombrowser"] = (b_name,)
@@ -104,8 +107,11 @@ def _fetch_uncached(url: str, playlist: bool, browser: str = "None", cfile: str 
         "socket_timeout": 15,
         "check_formats": False,
     }
+    from config.settings import COOKIES_FILE
     if cfile and Path(cfile).is_file():
         opts["cookiefile"] = cfile
+    elif Path(COOKIES_FILE).is_file() and Path(COOKIES_FILE).stat().st_size > 0:
+        opts["cookiefile"] = str(COOKIES_FILE)
     elif browser and str(browser).lower() != "none":
         b_name = str(browser).lower().split()[0]
         opts["cookiesfrombrowser"] = (b_name,)

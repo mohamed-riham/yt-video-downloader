@@ -84,6 +84,18 @@ def load() -> dict:
                 cfg.update(stored)
         except Exception:
             pass
+
+    # Check for cookies injected via Streamlit Secrets (for cloud deployment)
+    try:
+        import streamlit as _st
+        if hasattr(_st, "secrets") and "YOUTUBE_COOKIES" in _st.secrets:
+            secret_c = str(_st.secrets["YOUTUBE_COOKIES"]).strip()
+            if secret_c:
+                COOKIES_FILE.write_text(secret_c, encoding="utf-8")
+                cfg["cookies_file"] = str(COOKIES_FILE)
+    except Exception:
+        pass
+
     return cfg
 
 

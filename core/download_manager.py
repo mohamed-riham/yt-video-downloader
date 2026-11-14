@@ -92,8 +92,9 @@ def build_opts(j: Job, hook, pp_hook) -> dict:
     cf = ss.get("cookies_file", "")
     if cf and os.path.isfile(cf):
         o["cookiefile"] = cf
-    elif b != "None":
-        o["cookiesfrombrowser"] = (b.lower(),)
+    elif b and str(b).lower() != "none":
+        b_name = str(b).lower().split()[0]
+        o["cookiesfrombrowser"] = (b_name,)
 
     # Time range section (e.g. *00:01:00-00:02:30)
     if j.start_time.strip() or j.end_time.strip():

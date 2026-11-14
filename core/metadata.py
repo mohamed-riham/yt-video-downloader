@@ -20,8 +20,9 @@ def _fetch_cached(url: str, playlist: bool, browser: str, cfile: str) -> dict:
         opts["playlistend"] = 1
     if cfile and Path(cfile).is_file():
         opts["cookiefile"] = cfile
-    elif browser != "None":
-        opts["cookiesfrombrowser"] = (browser.lower(),)
+    elif browser and str(browser).lower() != "none":
+        b_name = str(browser).lower().split()[0]
+        opts["cookiesfrombrowser"] = (b_name,)
     with YoutubeDL(opts) as y:
         info = y.extract_info(url, download=False)
     if not playlist and info.get("_type") == "playlist":
@@ -94,8 +95,9 @@ def _fetch_uncached(url: str, playlist: bool, browser: str = "None", cfile: str 
     }
     if cfile and Path(cfile).is_file():
         opts["cookiefile"] = cfile
-    elif browser != "None":
-        opts["cookiesfrombrowser"] = (browser.lower(),)
+    elif browser and str(browser).lower() != "none":
+        b_name = str(browser).lower().split()[0]
+        opts["cookiesfrombrowser"] = (b_name,)
     with YoutubeDL(opts) as y:
         info = y.extract_info(url, download=False)
     if not playlist and info.get("_type") == "playlist":

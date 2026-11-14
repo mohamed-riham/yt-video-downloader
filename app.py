@@ -69,10 +69,17 @@ def page_dashboard() -> None:
     ck_file = S.get("cookies_file", "").strip()
     has_file = ck_file and Path(ck_file).is_file() and Path(ck_file).stat().st_size > 0
     if ck_browser == "None" and not has_file:
-        st.warning(
-            "⚠️ **No cookie source configured.** YouTube often requires verification for high resolutions or age-restricted media. "
-            "Visit the **Cookie Guide** page to easily set up cookies in 1 minute.",
-        )
+        c_warn, c_btn = st.columns([3, 1.2])
+        with c_warn:
+            st.warning(
+                "⚠️ **No cookie source configured.** YouTube often requires verification for high resolutions or age-restricted media."
+            )
+        with c_btn:
+            if st.button("🦊 Use Firefox (1-Click)", use_container_width=True, type="primary"):
+                S["cookies_browser"] = "Firefox"
+                cfg.save(S)
+                st.toast("Firefox cookies activated!")
+                st.rerun()
 
     # Top Hero Card
     with st.container(border=True):
@@ -507,17 +514,28 @@ def page_cookie_guide() -> None:
     with col_a:
         with st.container(border=True):
             st.markdown("### 🦊 Method A: Firefox (Recommended)")
-            st.markdown("**100% Automatic — Zero files to export**")
+            st.markdown("**100% Automatic — No files, No extensions needed**")
             st.markdown(
                 """
-1. Open **Mozilla Firefox** on this PC.
-2. Log into your **YouTube.com** account.
-3. **Exit Firefox completely** so SQLite session locks release.
-4. Go to **Settings ▶ Use browser cookies**, select **Firefox**, and click **Save All Settings**!
+1. Log into **YouTube.com** inside **Mozilla Firefox**.
+2. Click the button below to link Firefox cookies directly.
+3. yt-dlp will read Firefox session cookies automatically without exporting anything!
 
-*Why Firefox? Chrome and Edge lock their cookie databases when running. Firefox allows clean external session access.*
+*Why Firefox? Firefox does not lock its cookie database or encrypt sessions with App-Bound locks. It just works seamlessly.*
                 """
             )
+            if ck_browser.lower() == "firefox":
+                st.success("✅ **Firefox cookies are currently ACTIVE!**")
+                if st.button("Disable Firefox Cookies", use_container_width=True):
+                    S["cookies_browser"] = "None"
+                    cfg.save(S)
+                    st.rerun()
+            else:
+                if st.button("🦊 Enable Firefox Cookies (1-Click)", type="primary", use_container_width=True):
+                    S["cookies_browser"] = "Firefox"
+                    cfg.save(S)
+                    st.toast("Firefox cookies activated!")
+                    st.rerun()
 
     with col_b:
         with st.container(border=True):

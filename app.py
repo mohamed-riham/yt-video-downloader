@@ -5,6 +5,7 @@ Windows-first YouTube downloader built with Python 3.10+, Streamlit, yt-dlp, and
 from __future__ import annotations
 
 import base64
+import html
 import os
 import shutil
 import uuid
@@ -302,7 +303,8 @@ def _render_queue() -> None:
             c_info, c_action = st.columns([4, 1.2])
             with c_info:
                 icon = "🎬" if j.kind == "Video" else "🎵"
-                st.markdown(f"<div style='font-size: 16px; font-weight: 750; margin-bottom: 6px; color: var(--text-primary);'>{icon} {j.title}</div>", unsafe_allow_html=True)
+                safe_title = html.escape(str(j.title))
+                st.markdown(f"<div style='font-size: 16px; font-weight: 750; margin-bottom: 6px; color: var(--text-primary);'>{icon} {safe_title}</div>", unsafe_allow_html=True)
 
                 speed_str = f"⚡ {fmt_size(j.speed)}/s" if j.speed else ""
                 eta_str = f"⏱️ ETA {fmt_time(j.eta)}" if j.eta else ""
@@ -446,10 +448,23 @@ def page_history() -> None:
             c_d.markdown(f"<span style='color:var(--text-muted); font-size:12px;'>{item.get('date', '')}</span>", unsafe_allow_html=True)
             with c_b:
                 fpath = item.get("file", "")
-                if fpath:
+                if fpath and os.path.exists(fpath):
                     if st.button("📂 Locate", key=f"loc_{item.get('id')}", use_container_width=True):
                         ok, msg = reveal(fpath)
                         st.toast(msg)
+                    try:
+                        with open(fpath, "rb") as f:
+                            st.download_button(
+                                "📥 To Device",
+                                data=f.read(),
+                                file_name=os.path.basename(fpath),
+                                key=f"dl_hist_{item.get('id')}",
+                                use_container_width=True,
+                            )
+                    except Exception:
+                        pass
+                else:
+                    st.caption("File moved/deleted")
 
     if st.button("🗑️ Clear Entire History", type="secondary"):
         hist.clear()

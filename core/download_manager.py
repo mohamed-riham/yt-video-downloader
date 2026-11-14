@@ -292,10 +292,10 @@ class Manager:
             rd_list: list[dict] = info.get("requested_downloads") or []
             rd: dict = rd_list[0] if rd_list else {}
 
-            filepath = rd.get("filepath") or ""
+            filepath = rd.get("filepath") or info.get("_filename") or ""
             if not filepath or not os.path.exists(filepath):
                 for entry in rd_list:
-                    candidate = entry.get("filepath") or ""
+                    candidate = entry.get("filepath") or entry.get("_filename") or ""
                     if candidate and os.path.exists(candidate):
                         filepath = candidate
                         break
@@ -308,6 +308,19 @@ class Manager:
                     if os.path.exists(cand):
                         filepath = cand
                         break
+
+            # Search outdir for the most recently completed file matching the media extensions
+            if not filepath or not os.path.exists(filepath):
+                try:
+                    candidates = [
+                        os.path.join(j.outdir, f) for f in os.listdir(j.outdir)
+                        if f.endswith((".mp4", ".mp3", ".m4a", ".webm", ".mkv"))
+                    ]
+                    if candidates:
+                        candidates.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+                        filepath = candidates[0]
+                except Exception:
+                    pass
 
             j.file = filepath
             j.status = "Done"

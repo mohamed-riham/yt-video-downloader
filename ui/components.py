@@ -41,8 +41,11 @@ def render_brand_header(logo_path: Path) -> None:
 
 def render_preview_card(meta: dict) -> None:
     """Render modern preview card with thumbnail duration overlay and resolution badges."""
-    t = meta.get("title", "Untitled Video")
-    ch = meta.get("channel", "Unknown Channel")
+    import html
+    raw_t = meta.get("title", "Untitled Video")
+    raw_ch = meta.get("channel", "Unknown Channel")
+    t = html.escape(str(raw_t))
+    ch = html.escape(str(raw_ch))
     dur_sec = meta.get("duration")
     dur = fmt_time(dur_sec) if dur_sec else "Live"
     thumb = meta.get("thumb", "")

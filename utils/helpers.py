@@ -75,18 +75,18 @@ def classify(url: str) -> str:
 
 _RULES: list[tuple[str, str]] = [
     (r"cookie|dpapi", "Couldn't read browser cookies. Fully close that browser, or try Firefox."),
-    (r"private video", "This video is private."),
-    (r"age.restricted|confirm your age", "Age-restricted video: sign-in is required and is not supported."),
+    (r"private video", "This video is private and requires sign-in."),
+    (r"age.restricted|confirm your age", "Age-restricted video: sign-in is required via Cookie Guide."),
     (r"not available in your country|\bgeo\b|georestrict", "This video is blocked in your region."),
-    (r"not a bot|bot check|confirm you(?:'re| are) not a bot", "YouTube asked for verification. Update yt-dlp, then pick a signed-in browser under Settings > Use browser cookies."),
+    (r"not a bot|bot check|confirm you(?:'re| are) not a bot", "YouTube asked for verification. If running on cloud, YouTube blocks cloud servers — run locally on your PC or add cookies in Cookie Guide."),
     (r"video unavailable|has been removed|does not exist", "This video is unavailable or was removed."),
-    (r"getaddrinfo|timed out|\bconnection\b|\bnetwork\b|urlopen", "Network problem. Check your connection and retry (partial files resume)."),
-    (r"\bffmpeg\b|\bffprobe\b", "FFmpeg is missing or failed. Install it and restart the app (see Settings)."),
-    (r"no space|errno 28|disk space", "Not enough disk space in the output folder."),
-    (r"permission|errno 13|access is denied", "Permission denied for the output folder. Choose another folder."),
-    (r"requested format is not available", "That quality isn't available for this video. Pick another."),
-    (r"unsupported url", "This link isn't supported."),
-    (r"unable to extract|http error 403|sign in to confirm", "YouTube changed something. Update yt-dlp in Settings and retry."),
+    (r"getaddrinfo|timed out|\bconnection\b|\bnetwork\b|urlopen", "Network problem. Check your internet connection and retry."),
+    (r"\bffmpeg\b|\bffprobe\b", "FFmpeg is missing or failed. Check Settings > System Diagnostics."),
+    (r"no space|errno 28|disk space", "Not enough disk space in the destination folder."),
+    (r"permission|errno 13|access is denied", "Permission denied for the output folder. Choose another folder in Settings."),
+    (r"requested format is not available", "That format isn't available for this video (or requires YouTube Premium). Pick another quality target."),
+    (r"unsupported url", "This link is not a recognized YouTube URL."),
+    (r"unable to extract|http error 403|sign in to confirm", "YouTube blocked this cloud server connection (HTTP 403). Run the app locally on your PC (zero cookies needed), or upload cookies.txt on Cookie Guide."),
 ]
 
 _COMPILED_RULES: list[tuple[re.Pattern, str]] = [

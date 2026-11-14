@@ -5,6 +5,7 @@
 ========================================================================
 
 Hi! Here is how to run the YouTube Downloader on your Windows PC in 1 click.
+NO COOKIES OR LOGIN NEEDED FOR REGULAR DOWNLOADS!
 
 ------------------------------------------------------------------------
 STEP 1: EXTRACT THE ZIP FILE
@@ -13,52 +14,37 @@ STEP 1: EXTRACT THE ZIP FILE
 2. Open the extracted folder.
 
 ------------------------------------------------------------------------
-STEP 2: DOUBLE-CLICK "START_DOWNLOADER.bat" (or "START.bat")
+STEP 2: DOUBLE-CLICK "START.bat" (or "START_DOWNLOADER.bat")
 ------------------------------------------------------------------------
 Inside the folder, simply double-click:
 
-     ▶  START_DOWNLOADER.bat
+     ▶  START.bat
 
-- On your first run, it sets up everything automatically in about 1 minute
-  (using the Python already installed on your PC).
+- On your first run, it sets up everything automatically in about 1 minute.
 - When ready, your web browser will automatically open the downloader
   at http://localhost:8501 !
 - On all future runs, it starts up in 2 seconds.
 
 ------------------------------------------------------------------------
-STEP 3: HOW TO DOWNLOAD
+STEP 3: HOW TO DOWNLOAD (ZERO COOKIES NEEDED)
 ------------------------------------------------------------------------
 1. Copy any YouTube video, Shorts, or playlist link.
 2. In the app, paste the link into the URL box.
-3. Choose "Video" (MP4 up to 4K) or "Audio" (MP3 320kbps).
+3. Choose "Video" (MP4 up to 4K) or "Audio" (MP3 320 kbps).
 4. Click "Download Now"!
-5. When finished, click "Show file" to open the video in your folder.
+5. When finished, click "Locate File" to open the video in your Downloads folder.
 
 ------------------------------------------------------------------------
-IMPORTANT: FIXING YOUTUBE'S "CONFIRM YOU'RE NOT A BOT" CHECK
+OPTIONAL: ONLY FOR 18+ AGE-RESTRICTED VIDEOS
 ------------------------------------------------------------------------
-YouTube sometimes blocks automated tools unless you provide your browser cookies.
-The app makes this super easy and 100% private:
-
-OPTION A (EASIEST - 1-Click with Chrome or Edge extension):
-1. In your browser (Chrome or Edge), install this official free extension:
-   Get cookies.txt LOCALLY:
-   https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
-
-2. Open YouTube.com (make sure you are logged in).
-3. Click the extension icon in your browser toolbar, then click "Export".
-   A file named "youtube.com_cookies.txt" will download to your PC.
-4. In the app, go to the "Cookie Guide" tab on the left sidebar.
-5. Click "Upload cookies.txt Directly" and choose that downloaded file.
-   Done! Now all downloads will work seamlessly without any verification errors!
-
-OPTION B (If you use Mozilla Firefox):
-1. Just log into YouTube in Firefox.
-2. Close Firefox.
-3. In app Settings, select "Firefox" under cookies.
+For 95% of YouTube videos, you do NOT need any cookies at all.
+Only if a video is flagged as 18+ age-restricted by YouTube:
+1. Open the "Cookie Guide" tab in the left sidebar.
+2. Click "Enable Firefox Cookies (1-Click)" OR upload a cookies.txt file.
 
 ------------------------------------------------------------------------
-PRIVACY NOTE:
-All downloads and cookies stay 100% on your local computer. Nothing is sent
-to any cloud servers or third parties.
+NEED HELP?
+------------------------------------------------------------------------
+- GitHub: https://github.com/mohamed-riham/yt-video-downloader
+- Author: Mohamed Riham (mohamedriham93@gmail.com)
 ========================================================================

@@ -122,9 +122,9 @@ def build_opts(j: Job, hook, pp_hook) -> dict:
     if j.kind == "Video":
         h = j.quality.rstrip("p")
         if not h.isdigit():
-            o["format"] = "bv*+ba/b"
+            o["format"] = "bv*+ba/b/best"
         else:
-            o["format"] = f"bv*[height<={h}]+ba/b[height<={h}]/b"
+            o["format"] = f"bv*[height<={h}]+ba/b[height<={h}]/bv*+ba/b/best"
         o["merge_output_format"] = "mp4"
         o["prefer_free_formats"] = False
 
@@ -137,7 +137,7 @@ def build_opts(j: Job, hook, pp_hook) -> dict:
             o["postprocessors"] = pps
     else:
         # Audio-only
-        o["format"] = "ba/b"
+        o["format"] = "ba/b/best"
         pps = []
         if "MP3" in j.quality:
             bitrate = j.quality.split()[1] if len(j.quality.split()) > 1 else "320"

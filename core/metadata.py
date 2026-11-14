@@ -15,6 +15,7 @@ def _fetch_cached(url: str, playlist: bool, browser: str, cfile: str) -> dict:
         "noplaylist": not playlist,
         "extract_flat": "in_playlist" if playlist else False,
         "socket_timeout": 15,
+        "check_formats": False,
     }
     if not playlist:
         opts["playlistend"] = 1
@@ -23,8 +24,17 @@ def _fetch_cached(url: str, playlist: bool, browser: str, cfile: str) -> dict:
     elif browser and str(browser).lower() != "none":
         b_name = str(browser).lower().split()[0]
         opts["cookiesfrombrowser"] = (b_name,)
-    with YoutubeDL(opts) as y:
-        info = y.extract_info(url, download=False)
+    try:
+        with YoutubeDL(opts) as y:
+            info = y.extract_info(url, download=False)
+    except Exception as e:
+        if "requested format is not available" in str(e).lower():
+            opts["format"] = "b/bv*+ba/best"
+            opts["check_formats"] = False
+            with YoutubeDL(opts) as y:
+                info = y.extract_info(url, download=False)
+        else:
+            raise
     if not playlist and info.get("_type") == "playlist":
         entries = info.get("entries") or []
         info = next((e for e in entries if e and e.get("id")), info)
@@ -92,6 +102,7 @@ def _fetch_uncached(url: str, playlist: bool, browser: str = "None", cfile: str 
         "noplaylist": not playlist,
         "extract_flat": "in_playlist" if playlist else False,
         "socket_timeout": 15,
+        "check_formats": False,
     }
     if cfile and Path(cfile).is_file():
         opts["cookiefile"] = cfile

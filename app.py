@@ -556,7 +556,15 @@ def page_cookie_guide() -> None:
             st.toast("Deleted saved cookie file.")
             st.rerun()
 
-    st.info(f"🔒 **Privacy Guarantee:** Your session cookies are stored exclusively on your local computer (`{cfg.APP_DIR}/cookies.txt`). They are never uploaded or transmitted to any external server.")
+    is_cloud = os.environ.get("STREAMLIT_SERVER_HEADLESS") == "true" or "/home/appuser" in str(cfg.APP_DIR)
+    if is_cloud:
+        st.warning(
+            "⚠️ **Cloud Instance Notice:** You are viewing this app hosted on Streamlit Community Cloud. "
+            f"Files and cookies uploaded here are stored inside this temporary cloud container (`{cfg.APP_DIR}`). "
+            "For **100% private and secure** downloads with your personal YouTube account, run the app locally on your Windows PC via `START.bat`."
+        )
+    else:
+        st.info(f"🔒 **Privacy Guarantee:** Your session cookies are stored exclusively on your local computer (`{cfg.APP_DIR}\\cookies.txt`). They are never uploaded or transmitted to any external server.")
 
 
 # ====================================================================

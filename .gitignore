@@ -1,0 +1,38 @@
+# Python Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+.env
+
+# Bytecode & Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Private User Data & Local Credentials (NEVER COMMIT)
+cookies.txt
+*.log
+history.json
+settings.json
+*.cookies*
+www.youtube.com_cookies.txt
+
+# Streamlit Cache
+.streamlit/secrets.toml
+
+# Archives
+*.zip
+*.rar
+*.7z
+*.tar.gz
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
